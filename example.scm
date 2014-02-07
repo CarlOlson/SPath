@@ -35,3 +35,12 @@
 			 "///h2//span[@/class='titletext']"))
 (define top-story (cadr (get-strings news-info)))
 (display "Top Story:\t")(display top-story)(newline)
+
+
+; Benchmark
+;; 1000 resource heavy queries
+;; Most computation time results from the full search at the start
+(display "Benchmarking 1000 queries:\n\t")
+(time
+ (for ((i (in-range 1000)))
+      (spath stock-page "///div[//@/id]")))
