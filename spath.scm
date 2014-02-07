@@ -63,7 +63,7 @@
 ;; -> list?
 ; Returns a list representation of the given string.
 ; Returned list is for easier parsing of s-expressions.
-; Retuned list is now refered to as "requests".
+; Retuned list members are now refered to as "requests".
 ; Syntax rules for SPath are defined here.
 (define (parse-query string)
   (let loop ((string string))
@@ -138,36 +138,31 @@
 ;; sexp  : list?
 ;; query : string?
 ;; -> list?
-; This is the only visible function of this file.
+; spath is the only visible function of this file.
 ; spath will take a list of s-expressions and parse,
 ; filter, and return them based on the supplied query.
 (define (spath sexp query)
-  (let loop ((sexp (list sexp))
-	     (path (parse-query query)))
+  (let loop ((path (parse-query query))
+	     (sexp (list sexp)))
     (if (or (null? path)
 	    (null? sexp))
 	sexp
-	(let ((request (car path)))
-	  (cond
-	   ((or (null? path)
-		(null? sexp)) sexp)
-	   ((string? request) ;find next sub-sexp groups
-	    (loop ((request->proc request)
-		   sexp is-member? (request->data request))
-		  (cdr path)))
-	   ((and (list? request) ;check sexp for member
-		 (eqv? (car request) '=))
-	    (loop (filter (request->pred request) sexp)
-		  (cdr path)))
-	   ((list? request) ;filter if sub-sexp chain is not found
-	    (loop (filter-not (compose null?
-				       (cut loop <> request)
+	(loop (cdr path)
+	      (let ((request (car path)))
+		(cond
+		 ((string? request) ;find next sub-sexp groups
+		  ((request->proc request)
+		   sexp is-member? (request->data request)))
+		 ((and (list? request) ;check sexp for member
+		       (eqv? (car request) '=))
+		  (filter (request->pred request) sexp))
+		 ((list? request) ;filter if sub-sexp chain is not found
+		  (filter-not (compose null?
+				       (cut loop request <>)
 				       list)
-			      sexp)
-		  (cdr path)))
-	   (else (error "Could not parse request.")))))))
+			      sexp))
+		 (else (error "Could not parse request."))))))))
 
 ; Export spath with a contract.
 (provide (contract-out
 	  [spath (list? string? . -> . list?)]))
-(provide parse-query)
