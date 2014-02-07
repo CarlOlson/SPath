@@ -3,24 +3,34 @@ SPath
 
 XPath like query system for s-expressions in Scheme or Racket
 
+Example Usage
+-------------
+		(define data	'(a	(b 1 (b 2))
+							(b 3 (b 4))))
+                            
+		(spath data "//b")
+		=> ((b 1 (b 2)) (b 3 (b 4)))
+		
+		(spath data "///b")
+		=> ((b 1 (b 2)) (b 2) (b 3 (b 4)) (b 4))
+		
+		(spath data "///b[/b=2]")
+		=> ((b 1 (b 2)))
 
 Syntax
 ------
-    (spath s-exp query)
-    ex, (spath sexp "//tag//[@/id=3]")
-
 <table>
   <tr>
     <td>///tag</td>
-    <td>Searches all levels for 'tag</td>
+    <td>Searches all levels for 'tag; "full search"</td>
   </tr>
   <tr>
     <td>//tag</td>
-    <td>Searches until it reaches 'tag</td>
+    <td>Searches until it reaches 'tag; "deep search"</td>
   </tr>
   <tr>
     <td>/tag</td>
-    <td>Searches the top level for 'tag</td>
+    <td>Searches the top level for 'tag; "shallow search"</td>
   </tr>
   <tr>
     <td>[/tag]</td>
