@@ -113,16 +113,15 @@
 ;; -> (or/c number? symbol? string?)
 ; Converts a request into its correct data type.
 (define (request->data string)
-  (let ((string (regexp-replace #rx"/*" string ""))
-	(convert (match string
-			[(regexp #rx"^[0-9]*\\.?[0-9]*$")
-			 string->number] ;number
-			[(regexp #rx"^[^']*$")
-			 string->symbol] ;symbol
-			[(regexp #rx"^'.*'$") 
-			 (cut regexp-replace* #rx"'" <> "")] ;string
-			[_ (error "Could not parse request.")]))) ;unknown
-    (convert string)))
+  (let ((string (regexp-replace #rx"/*" string "")))
+    (match string
+	   [(regexp #rx"^[0-9]*\\.?[0-9]*$")
+	    (string->number string)] ;number
+	   [(regexp #rx"^[^']*$")
+	    (string->symbol string)] ;symbol
+	   [(regexp #rx"^'.*'$")
+	    (regexp-replace #rx"^'(.*)'$" string "\\1")] ;string
+	   [_ (error "Could not parse request.")]))) ;unknown
 
 ; is-member?
 ;; sexp : list?
