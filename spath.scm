@@ -98,22 +98,22 @@
 	      (append-map (cut apply proc <> pred args) sexp)))))
 
 ; request->pred
-;; request : string?
+;; request : list?
 ;; -> procedure?
 ; Takes a request and returns a predicate.
 ; Used by requests that check value (=).
 (define (request->pred request)
   (lambda (sexp)
-    (and (eqv? (car request) '=)
-	 (member (map request->data (cdr request))
-		 sexp))))
+;    (and (eqv? (car request) '=)
+    (member (map request->data (cdr request))
+	    sexp)))
 
 ; request->data
 ;; request : string?
 ;; -> (or/c number? symbol? string?)
 ; Converts a request into its correct data type.
-(define (request->data string)
-  (let ((string (regexp-replace #rx"/*" string "")))
+(define (request->data request)
+  (let ((string (regexp-replace #rx"/*" request "")))
     (match string
 	   [(regexp #rx"^[0-9]*\\.?[0-9]*$")
 	    (string->number string)] ;number
@@ -153,6 +153,7 @@
 		  ((request->proc request)
 		   sexp is-member? (request->data request)))
 		 ((and (list? request) ;check sexp for member
+		       (> (length request) 1)
 		       (eqv? (car request) '=))
 		  (filter (request->pred request) sexp))
 		 ((list? request) ;filter if sub-sexp chain is not found
