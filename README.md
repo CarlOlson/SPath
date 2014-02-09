@@ -33,6 +33,9 @@ Syntax
     <td>Searches the top level for 'tag; "shallow search"</td>
   </tr>
   <tr>
+  	<td>*</td>
+  	<td>Wildcard, will match anything. <i>A deep search will act like a shallow search.</td>
+  <tr>
     <td>[/tag]</td>
     <td>Keeps groups with a 'tag sub-group</td>
   </tr>
