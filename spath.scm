@@ -131,7 +131,8 @@
 (define (is-member? sexp a)
   (and (list? sexp)
        (> (length sexp) 0)
-       (eqv? (car sexp) a)))
+       (or (eqv? (car sexp) a)
+	   (eqv? a '*)))) ;wildcard
 
 ; spath
 ;; sexp  : list?
